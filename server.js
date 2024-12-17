@@ -41,4 +41,11 @@ app.post("/add", (req, res) => {
     }
   );
 });
+
+db.all("SELECT * FROM users", [], (err, rows) => {
+  if (err) {
+    console.error("Error retrieving users:", err);
+    return res.json({ message: "Error retrieving users" });
+  }
+  console.log("All users:", rows);});
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
