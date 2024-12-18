@@ -17,8 +17,9 @@ db.run(`
   )
 `);
 
+// Add a user
 app.post("/add", (req, res) => {
-  const { username, email, password} = req.body;
+  const { username, email, password } = req.body;
   if (!username || !email || !password) {
     return res.json({ message: "All fields are required" });
   }
@@ -41,4 +42,13 @@ app.post("/add", (req, res) => {
     }
   );
 });
+
+// Fetch all users
+app.get("/getUsers", (req, res) => {
+  db.all("SELECT id, username, email FROM users", (err, rows) => {
+    if (err) return res.json({ message: "Error fetching users" });
+    return res.json(rows); // Send all user data
+  });
+});
+
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
