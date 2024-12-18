@@ -7,7 +7,7 @@ const PORT = 5000;
 app.use(express.json());
 app.use(cors());
 
-const db = new sqlite3.Database("./users.db");
+const db = new sqlite3.Database(":memory");
 db.run(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,11 +41,4 @@ app.post("/add", (req, res) => {
     }
   );
 });
-
-db.all("SELECT * FROM users", [], (err, rows) => {
-  if (err) {
-    console.error("Error retrieving users:", err);
-    return res.json({ message: "Error retrieving users" });
-  }
-  console.log("All users:", rows);});
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
