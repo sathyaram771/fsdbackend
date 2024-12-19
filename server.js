@@ -13,14 +13,18 @@ db.run(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE,
     email TEXT UNIQUE,
-    password TEXT
+    password TEXT,
+    empId TEXT,
+    department TEXT,
+    dateOfJoining TEXT,
+    role TEXT,
+    phoneNumber TEXT
   )
 `);
 
-// Add a user
 app.post("/add", (req, res) => {
-  const { username, email, password } = req.body;
-  if (!username || !email || !password) {
+  const { username, email, password, empId, department, dateOfJoining, role, phoneNumber } = req.body;
+  if (!username || !email || !password || !empId || !department || !dateOfJoining || !role || !phoneNumber) {
     return res.json({ message: "All fields are required" });
   }
   db.get(
@@ -32,8 +36,8 @@ app.post("/add", (req, res) => {
         if (row.email === email) return res.json({ message: "Email already registered" });
       }
       db.run(
-        "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
-        [username, email, password],
+        "INSERT INTO users (username, email, password, empId, department, dateOfJoining, role, phoneNumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        [username, email, password, empId, department, dateOfJoining, role, phoneNumber],
         (err) => {
           if (err) return res.json({ message: "Error saving user" });
           return res.json({ message: "User registered successfully" });
@@ -43,11 +47,10 @@ app.post("/add", (req, res) => {
   );
 });
 
-// Fetch all users
 app.get("/getUsers", (req, res) => {
-  db.all("SELECT id, username, email FROM users", (err, rows) => {
+  db.all("SELECT id, username, email, empId, department, dateOfJoining, role, phoneNumber FROM users", (err, rows) => {
     if (err) return res.json({ message: "Error fetching users" });
-    return res.json(rows); // Send all user data
+    return res.json(rows);
   });
 });
 
