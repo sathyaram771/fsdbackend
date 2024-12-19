@@ -18,7 +18,7 @@ db.run(`
     department TEXT,
     dateOfJoining TEXT,
     role TEXT,
-    phoneNumber TEXT
+    phoneNumber TEXT UNIQUE
   )
 `);
 
@@ -27,24 +27,32 @@ app.post("/add", (req, res) => {
   if (!username || !email || !password || !empId || !department || !dateOfJoining || !role || !phoneNumber) {
     return res.json({ message: "All fields are required" });
   }
-  db.get(
-    "SELECT * FROM users WHERE username = ? OR email = ?",
-    [username, email],
-    (err, row) => {
-      if (row) {
-        if (row.username === username) return res.json({ message: "Username already exists" });
-        if (row.email === email) return res.json({ message: "Email already registered" });
-      }
-      db.run(
-        "INSERT INTO users (username, email, password, empId, department, dateOfJoining, role, phoneNumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        [username, email, password, empId, department, dateOfJoining, role, phoneNumber],
-        (err) => {
-          if (err) return res.json({ message: "Error saving user" });
-          return res.json({ message: "User registered successfully" });
-        }
-      );
+
+  db.get("SELECT * FROM users WHERE phoneNumber = ?", [phoneNumber], (err, row) => {
+    if (row) {
+      return res.json({ message: "Mobile number already exists" });
     }
-  );
+
+    db.get(
+      "SELECT * FROM users WHERE username = ? OR email = ?",
+      [username, email],
+      (err, row) => {
+        if (row) {
+          if (row.username === username) return res.json({ message: "Username already exists" });
+          if (row.email === email) return res.json({ message: "Email already registered" });
+        }
+
+        db.run(
+          "INSERT INTO users (username, email, password, empId, department, dateOfJoining, role, phoneNumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+          [username, email, password, empId, department, dateOfJoining, role, phoneNumber],
+          (err) => {
+            if (err) return res.json({ message: "Error saving user" });
+            return res.json({ message: "User registered successfully" });
+          }
+        );
+      }
+    );
+  });
 });
 
 app.get("/getUsers", (req, res) => {
